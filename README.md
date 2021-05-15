@@ -1,4 +1,6 @@
 # EternalPatchManifestLinux
+[![Build Status](https://www.travis-ci.com/PowerBall253/EternalPatchManifestLinux.svg?branch=main)](https://www.travis-ci.com/PowerBall253/EternalPatchManifestLinux)
+
 DOOM Eternal build manifest patcher, rewritten in C for Linux.
 
 ## Usage
