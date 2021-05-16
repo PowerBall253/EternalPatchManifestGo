@@ -10,7 +10,7 @@ DOOM Eternal build manifest patcher, rewritten in C for Linux.
 Where AES key is the key used for AES encryption/decryption. The current valid key is `8B031F6A24C5C4F3950130C57EF660E9`.
 
 ## Compiling
-The project uses Cmake to compile.
+The project uses Cmake to compile, and requires OpenSSL to be installed.
 
 First clone the repo by running:
 
