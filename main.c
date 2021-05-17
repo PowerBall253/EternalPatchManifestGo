@@ -128,7 +128,6 @@ int main(int argc, char **argv)
     if (!bm_json)
         return 1;
 
-    int bm_enc_len;
     unsigned char *bm_enc = encrypt_bm(bm_json, argv[1]);
     free(bm_json);
 
