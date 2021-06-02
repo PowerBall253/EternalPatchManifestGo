@@ -49,8 +49,6 @@ char *optimize_bm(char *bm_json)
 
     files = cJSON_GetObjectItemCaseSensitive(json, "files");
 
-    int i = 0;
-
     cJSON_ArrayForEach(file, files) {
         cJSON *filesize = cJSON_GetObjectItemCaseSensitive(file, "fileSize");
         long new_filesize = get_filesize(file->string);
