@@ -16,7 +16,6 @@
 * along with EternalPatchManifestLinux. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <openssl/asn1.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
