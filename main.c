@@ -116,20 +116,26 @@ int main(int argc, char **argv)
     char *bm_dec = decrypt_bm(bm_bytes, bm_len, argv[1]);
     free(bm_bytes);
 
-    if (!bm_dec)
+    if (!bm_dec) {
+        fprintf(stderr, "ERROR: Failed to decrypt build manifest!\n");
         return 1;
+    }
 
     char *bm_json = optimize_bm(bm_dec);
     free(bm_dec);
 
-    if (!bm_json)
+    if (!bm_json) {
+        fprintf(stderr, "ERROR: Failed to modify the decrypted build manifest JSON!\n");
         return 1;
+    }
 
     unsigned char *bm_enc = encrypt_bm(bm_json, argv[1]);
     free(bm_json);
 
-    if (!bm_enc)
+    if (!bm_enc) {
+        fprintf(stderr, "ERROR: Failed to encrypt build manifest!\n");
         return 1;
+    }
     
     build_manifest = fopen("build-manifest.bin", "wb");
 
