@@ -24,6 +24,7 @@
 #include "cJSON/cJSON.h"
 #include "crypto.h"
 
+// Get filesize from the given file
 size_t get_filesize(const char *path)
 {
     FILE *f = fopen(path, "r");
@@ -39,6 +40,7 @@ size_t get_filesize(const char *path)
     return filesize;
 }
 
+// Optimize the JSON by removing uneeded entries and using dummy data
 char *optimize_bm(const char *bm_json)
 {
     cJSON *files = NULL;
@@ -93,6 +95,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    // Read the build manifest file
     FILE *build_manifest = fopen("build-manifest.bin", "rb");
 
     if (!build_manifest) {
@@ -113,6 +116,7 @@ int main(int argc, char **argv)
 
     fclose(build_manifest);
 
+    // Decrypt the build manifest data into a JSON
     char *bm_dec = decrypt_bm(bm_bytes, bm_len, argv[1]);
     free(bm_bytes);
 
@@ -121,6 +125,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    // Optimize the JSON file
     char *bm_json = optimize_bm(bm_dec);
     free(bm_dec);
 
@@ -129,6 +134,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    // Re-encrypt the build manifest JSON
     unsigned char *bm_enc = encrypt_bm(bm_json, argv[1]);
     free(bm_json);
 
@@ -137,7 +143,13 @@ int main(int argc, char **argv)
         return 1;
     }
     
+    // Write new build manifest data to file
     build_manifest = fopen("build-manifest.bin", "wb");
+
+    if (!build_manifest) {
+        fprintf(stderr, "ERROR: Failed to open build manifest for writing!\n");
+        return 1;
+    }
 
     fwrite(bm_enc, 1, 0xC + strlen(bm_json) + 0x10 + 0x40, build_manifest);
     free(bm_enc);

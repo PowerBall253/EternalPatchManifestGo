@@ -23,6 +23,7 @@
 #include <sys/random.h>
 #include <openssl/evp.h>
 
+// Decrypt using AES GCM 128
 size_t gcm_decrypt(const unsigned char *ciphertext, const size_t ciphertext_len,
                 const unsigned char *aad, const size_t aad_len,
                 unsigned char *tag,
@@ -68,6 +69,7 @@ size_t gcm_decrypt(const unsigned char *ciphertext, const size_t ciphertext_len,
     }
 }
 
+// Encrypt using AES GCM 128
 size_t gcm_encrypt(unsigned char *plaintext, const size_t plaintext_len,
                 const unsigned char *aad, const size_t aad_len,
                 const unsigned char *key,
@@ -109,6 +111,7 @@ size_t gcm_encrypt(unsigned char *plaintext, const size_t plaintext_len,
     return ciphertext_len;
 }
 
+// Convert hex string to byte array
 unsigned char *hex_to_bytes(const char *str)
 {
     unsigned char *bytes = malloc(strlen(str) / 2);
@@ -133,6 +136,7 @@ unsigned char *hex_to_bytes(const char *str)
     return bytes;
 }
 
+// Decrypt build manifest file into a JSON
 char *decrypt_bm(const unsigned char *enc_data, const size_t enc_data_len, const char *hex_key)
 {
     unsigned char iv[0xC];
@@ -179,6 +183,7 @@ char *decrypt_bm(const unsigned char *enc_data, const size_t enc_data_len, const
     return plaintext;
 }
 
+// Re-encrypt build manifest JSON
 unsigned char *encrypt_bm(const char *bm_json, const char *hex_key)
 {
     unsigned char iv[0xC];
