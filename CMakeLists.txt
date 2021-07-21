@@ -6,7 +6,9 @@ set(CMAKE_C_STANDARD 99)
 file(GLOB SOURCES
         ./main.c
         ./crypto.c
+        ./crypto.h
         ./cJSON/cJSON.c
+        ./cJSON/cJSON.h
         )
 
 find_package(OpenSSL REQUIRED)

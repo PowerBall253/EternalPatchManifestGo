@@ -23,16 +23,16 @@
 #include <sys/random.h>
 #include <openssl/evp.h>
 
-int gcm_decrypt(unsigned char *ciphertext, int ciphertext_len,
-                unsigned char *aad, int aad_len,
+size_t gcm_decrypt(const unsigned char *ciphertext, const size_t ciphertext_len,
+                const unsigned char *aad, const size_t aad_len,
                 unsigned char *tag,
-                unsigned char *key,
-                unsigned char *iv, int iv_len,
+                const unsigned char *key,
+                const unsigned char *iv, const size_t iv_len,
                 unsigned char *plaintext)
 {
     EVP_CIPHER_CTX *ctx;
     int len;
-    int plaintext_len;
+    size_t plaintext_len;
     int ret;
 
     if (!(ctx = EVP_CIPHER_CTX_new()))
@@ -68,16 +68,16 @@ int gcm_decrypt(unsigned char *ciphertext, int ciphertext_len,
     }
 }
 
-int gcm_encrypt(unsigned char *plaintext, int plaintext_len,
-                unsigned char *aad, int aad_len,
-                unsigned char *key,
-                unsigned char *iv, int iv_len,
+size_t gcm_encrypt(unsigned char *plaintext, const size_t plaintext_len,
+                const unsigned char *aad, const size_t aad_len,
+                const unsigned char *key,
+                const unsigned char *iv, const size_t iv_len,
                 unsigned char *ciphertext,
                 unsigned char *tag)
 {
     EVP_CIPHER_CTX *ctx;
     int len;
-    int ciphertext_len;
+    size_t ciphertext_len;
 
     if (!(ctx = EVP_CIPHER_CTX_new()))
         return -1;
@@ -109,7 +109,7 @@ int gcm_encrypt(unsigned char *plaintext, int plaintext_len,
     return ciphertext_len;
 }
 
-unsigned char *hex_to_bytes(char *str)
+unsigned char *hex_to_bytes(const char *str)
 {
     unsigned char *bytes = malloc(strlen(str) / 2);
 
@@ -133,7 +133,7 @@ unsigned char *hex_to_bytes(char *str)
     return bytes;
 }
 
-char *decrypt_bm(unsigned char *enc_data, int enc_data_len, char *hex_key)
+char *decrypt_bm(const unsigned char *enc_data, const size_t enc_data_len, const char *hex_key)
 {
     unsigned char iv[0xC];
     memcpy(iv, enc_data, 0xC);
@@ -165,7 +165,8 @@ char *decrypt_bm(unsigned char *enc_data, int enc_data_len, char *hex_key)
         return NULL;
     }
 
-    int res = gcm_decrypt(ciphertext, enc_data_len - 0xC - 0x50, (unsigned char*)"build-manifest", strlen("build-manifest"), tag, key, iv, 0xC, (unsigned char*)plaintext);
+    size_t res = gcm_decrypt(ciphertext, enc_data_len - 0xC - 0x50, (unsigned char*)"build-manifest",
+        strlen("build-manifest"), tag, key, iv, 0xC, (unsigned char*)plaintext);
 
     free(key);
     free(ciphertext);
@@ -178,7 +179,7 @@ char *decrypt_bm(unsigned char *enc_data, int enc_data_len, char *hex_key)
     return plaintext;
 }
 
-unsigned char *encrypt_bm(char *bm_json, char *hex_key)
+unsigned char *encrypt_bm(const char *bm_json, const char *hex_key)
 {
     unsigned char iv[0xC];
 
@@ -203,7 +204,7 @@ unsigned char *encrypt_bm(char *bm_json, char *hex_key)
         return NULL;
     }
 
-    int res = gcm_encrypt((unsigned char*)bm_json, strlen(bm_json), (unsigned char*)"build-manifest", 14, key, iv, 0xC, ciphertext, tag);
+    size_t res = gcm_encrypt((unsigned char*)bm_json, strlen(bm_json), (unsigned char*)"build-manifest", 14, key, iv, 0xC, ciphertext, tag);
 
     free(key);
 

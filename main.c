@@ -24,7 +24,7 @@
 #include "cJSON/cJSON.h"
 #include "crypto.h"
 
-long get_filesize(const char *path)
+size_t get_filesize(const char *path)
 {
     FILE *f = fopen(path, "r");
 
@@ -32,14 +32,14 @@ long get_filesize(const char *path)
         return -1;
 
     fseek(f, 0, SEEK_END);
-    long filesize = ftell(f);
+    size_t filesize = ftell(f);
 
     fclose(f);
 
     return filesize;
 }
 
-char *optimize_bm(char *bm_json)
+char *optimize_bm(const char *bm_json)
 {
     cJSON *files = NULL;
     cJSON *file = NULL;
@@ -50,7 +50,7 @@ char *optimize_bm(char *bm_json)
 
     cJSON_ArrayForEach(file, files) {
         cJSON *filesize = cJSON_GetObjectItemCaseSensitive(file, "fileSize");
-        long new_filesize = get_filesize(file->string);
+        size_t new_filesize = get_filesize(file->string);
 
         if (new_filesize == -1)
             continue;
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
     }
 
     fseek(build_manifest, 0, SEEK_END);
-    long bm_len = ftell(build_manifest);
+    size_t bm_len = ftell(build_manifest);
     fseek(build_manifest, 0, SEEK_SET);
 
     unsigned char *bm_bytes = malloc(bm_len);

@@ -19,7 +19,7 @@
 #ifndef CRYPTO_H
 #define CRYPTO_H
 
-char *decrypt_bm(unsigned char *enc_data, int enc_data_len, char *hex_key);
-unsigned char *encrypt_bm(char *bm_json, char *hex_key);
+char *decrypt_bm(const unsigned char *enc_data, const size_t enc_data_len, const char *hex_key);
+unsigned char *encrypt_bm(const char *bm_json, const char *hex_key);
 
 #endif
