@@ -86,6 +86,7 @@ int main(int argc, char **argv)
 {
     printf("EternalPatchManifestLinux v1.0 by PowerBall253 :)\n\n");
 
+    // Print usage
     if (argc < 2) {
         printf("Usage:\n");
         printf("%s <AES key>\n\n", argv[0]);

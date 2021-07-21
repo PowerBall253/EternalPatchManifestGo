@@ -116,9 +116,8 @@ unsigned char *hex_to_bytes(const char *str)
 {
     unsigned char *bytes = malloc(strlen(str) / 2);
 
-    if (!bytes) {
+    if (!bytes)
         return NULL;
-    }
 
     for (int i = 0; i < strlen(str); i += 2) {
         char byte_str[3];
@@ -128,9 +127,8 @@ unsigned char *hex_to_bytes(const char *str)
         char *endptr;
         bytes[i / 2] = strtol(byte_str, &endptr, 16);
 
-        if (endptr == byte_str || *endptr != '\0' || errno == ERANGE) {
+        if (endptr == byte_str || *endptr != '\0' || errno == ERANGE)
             return NULL;
-        }
     }
 
     return bytes;
