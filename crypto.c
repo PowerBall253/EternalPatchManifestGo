@@ -28,7 +28,7 @@ size_t gcm_decrypt(const unsigned char *ciphertext, const size_t ciphertext_len,
                 const unsigned char *aad, const size_t aad_len,
                 unsigned char *tag,
                 const unsigned char *key,
-                const unsigned char *iv, const size_t iv_len,
+                const unsigned char *iv,
                 unsigned char *plaintext)
 {
     EVP_CIPHER_CTX *ctx;
@@ -45,10 +45,10 @@ size_t gcm_decrypt(const unsigned char *ciphertext, const size_t ciphertext_len,
     if (!EVP_DecryptInit_ex(ctx, NULL, NULL, key, iv))
         return -1;
 
-    if (!EVP_DecryptUpdate(ctx, NULL, &len, aad, aad_len))
+    if (!EVP_DecryptUpdate(ctx, NULL, &len, aad, (int)aad_len))
         return -1;
 
-    if (!EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+    if (!EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, (int)ciphertext_len))
         return -1;
 
     plaintext_len = len;
@@ -73,7 +73,7 @@ size_t gcm_decrypt(const unsigned char *ciphertext, const size_t ciphertext_len,
 size_t gcm_encrypt(unsigned char *plaintext, const size_t plaintext_len,
                 const unsigned char *aad, const size_t aad_len,
                 const unsigned char *key,
-                const unsigned char *iv, const size_t iv_len,
+                const unsigned char *iv,
                 unsigned char *ciphertext,
                 unsigned char *tag)
 {
@@ -90,10 +90,10 @@ size_t gcm_encrypt(unsigned char *plaintext, const size_t plaintext_len,
     if (!EVP_EncryptInit_ex(ctx, NULL, NULL, key, iv))
         return -1;
 
-    if (!EVP_EncryptUpdate(ctx, NULL, &len, aad, aad_len))
+    if (!EVP_EncryptUpdate(ctx, NULL, &len, aad, (int)aad_len))
         return -1;
 
-    if (!EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+    if (!EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, (int)plaintext_len))
         return -1;
 
     ciphertext_len = len;
@@ -162,13 +162,13 @@ char *decrypt_bm(const unsigned char *enc_data, const size_t enc_data_len, const
 
     char *plaintext = malloc(enc_data_len - 0xC - 0x50);
 
-    if (!ciphertext) {
+    if (!plaintext) {
         fprintf(stderr, "ERROR: Failed to allocate memory for plaintext!\n");
         return NULL;
     }
 
     size_t res = gcm_decrypt(ciphertext, enc_data_len - 0xC - 0x50, (unsigned char*)"build-manifest",
-        strlen("build-manifest"), tag, key, iv, 0xC, (unsigned char*)plaintext);
+        strlen("build-manifest"), tag, key, iv, (unsigned char*)plaintext);
 
     free(key);
     free(ciphertext);
@@ -207,7 +207,7 @@ unsigned char *encrypt_bm(const char *bm_json, const char *hex_key)
         return NULL;
     }
 
-    size_t res = gcm_encrypt((unsigned char*)bm_json, strlen(bm_json), (unsigned char*)"build-manifest", 14, key, iv, 0xC, ciphertext, tag);
+    size_t res = gcm_encrypt((unsigned char*)bm_json, strlen(bm_json), (unsigned char*)"build-manifest", 14, key, iv, ciphertext, tag);
 
     free(key);
 
@@ -216,7 +216,7 @@ unsigned char *encrypt_bm(const char *bm_json, const char *hex_key)
         return NULL;
     }
 
-    int bm_enc_len = 0xC + strlen(bm_json) + 0x10 + 0x40;
+    size_t bm_enc_len = 0xC + strlen(bm_json) + 0x10 + 0x40;
 
     unsigned char *bm_enc = malloc(bm_enc_len);
 

@@ -16,4 +16,4 @@ find_package(OpenSSL REQUIRED)
 set (CMAKE_C_FLAGS "-O2 -DNDEBUG")
 add_executable(DEternal_patchManifest ${SOURCES})
 
-target_link_libraries(DEternal_patchManifest crypto)
+target_link_libraries(DEternal_patchManifest OpenSSL::Crypto)

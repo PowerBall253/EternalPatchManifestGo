@@ -64,7 +64,7 @@ char *optimize_bm(const char *bm_json)
         cJSON *new_hashes = cJSON_CreateArray();
         cJSON *hash_str = cJSON_CreateString("e2df1b2aa831724ec987300f0790f04ad3f5beb8");
 
-        int num_hashes = (new_filesize / 4294967295) + (new_filesize % 4294967295 > 0);
+        int num_hashes = (int)(new_filesize / 4294967295) + (new_filesize % 4294967295 > 0 ? 1 : 0);
 
         for (int i = 0;  i < num_hashes; i++)
             cJSON_AddItemReferenceToArray(new_hashes, hash_str);
@@ -128,6 +128,7 @@ int main(int argc, char **argv)
 
     // Optimize the JSON file
     char *bm_json = optimize_bm(bm_dec);
+    size_t bm_json_len = strlen(bm_json);
     free(bm_dec);
 
     if (!bm_json) {
@@ -152,7 +153,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    fwrite(bm_enc, 1, 0xC + strlen(bm_json) + 0x10 + 0x40, build_manifest);
+    fwrite(bm_enc, 1, 0xC + bm_json_len + 0x10 + 0x40, build_manifest);
     free(bm_enc);
     
     fclose(build_manifest);
