@@ -84,7 +84,7 @@ char *optimize_bm(const char *bm_json)
 
 int main(int argc, char **argv)
 {
-    printf("EternalPatchManifestLinux v1.3.3 by PowerBall253 :)\n\n");
+    printf("EternalPatchManifestLinux v1.3.4 by PowerBall253 :)\n\n");
 
     // Print usage
     if (argc < 2) {
