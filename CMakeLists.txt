@@ -11,7 +11,7 @@ file(GLOB SOURCES
         ./cJSON/cJSON.h
         )
 
-find_package(OpenSSL REQUIRED)
+find_package(OpenSSL "3.0" REQUIRED)
 
 set (CMAKE_C_FLAGS "-O2 -DNDEBUG")
 add_executable(DEternal_patchManifest ${SOURCES})
