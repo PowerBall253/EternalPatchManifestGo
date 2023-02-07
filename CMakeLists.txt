@@ -11,9 +11,14 @@ file(GLOB SOURCES
         ./cJSON/cJSON.h
         )
 
+if(DEFINED ENV{ETERNALPATCHMANIFESTLINUX_STATIC})
+        set (CMAKE_C_FLAGS "-O2 -static -s")
+        set(OPENSSL_USE_STATIC_LIBS TRUE)
+else()
+        set (CMAKE_C_FLAGS "-O2 -s")
+endif()
+
 find_package(OpenSSL "3.0" REQUIRED)
 
-set (CMAKE_C_FLAGS "-O2 -DNDEBUG")
 add_executable(DEternal_patchManifest ${SOURCES})
-
 target_link_libraries(DEternal_patchManifest OpenSSL::Crypto)
