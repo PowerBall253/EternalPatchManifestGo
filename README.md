@@ -1,6 +1,6 @@
 # EternalPatchManifestLinux
 
-![Build Status](https://github.com/PowerBall253/EternalPatchManifestLinux/actions/workflows/release.yml/badge.svg)
+![Build Status](https://github.com/PowerBall253/EternalPatchManifestLinux/actions/workflows/test.yml/badge.svg)
 
 
 DOOM Eternal build manifest patcher, rewritten in C for Linux.
