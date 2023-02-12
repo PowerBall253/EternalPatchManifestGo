@@ -24,6 +24,8 @@
 #include "cJSON/cJSON.h"
 #include "crypto.h"
 
+#define eprintf(...) fprintf(stderr, __VA_ARGS__)
+
 // Get filesize from the given file
 size_t get_filesize(const char *path)
 {
@@ -100,7 +102,7 @@ int main(int argc, char **argv)
     FILE *build_manifest = fopen("build-manifest.bin", "rb");
 
     if (!build_manifest) {
-        fprintf(stderr, "ERROR: Failed to open build manifest for reading!\n");
+        perror("ERROR: Failed to open build manifest for reading");
         return 1;
     }
 
@@ -111,7 +113,9 @@ int main(int argc, char **argv)
     unsigned char *bm_bytes = malloc(bm_len);
 
     if (fread(bm_bytes, 1, bm_len, build_manifest) != bm_len) {
-        fprintf(stderr, "ERROR: Failed to read from build manifest!\n");
+        perror("ERROR: Failed to read from build manifest");
+        free(bm_bytes);
+        fclose(build_manifest);
         return 1;
     }
 
@@ -122,17 +126,16 @@ int main(int argc, char **argv)
     free(bm_bytes);
 
     if (!bm_dec) {
-        fprintf(stderr, "ERROR: Failed to decrypt build manifest!\n");
+        eprintf("ERROR: Failed to decrypt build manifest.\n");
         return 1;
     }
 
     // Optimize the JSON file
     char *bm_json = optimize_bm(bm_dec);
-    size_t bm_json_len = strlen(bm_json);
     free(bm_dec);
 
     if (!bm_json) {
-        fprintf(stderr, "ERROR: Failed to modify the decrypted build manifest JSON!\n");
+        eprintf("ERROR: Failed to modify the decrypted build manifest JSON.\n");
         return 1;
     }
 
@@ -141,7 +144,7 @@ int main(int argc, char **argv)
     free(bm_json);
 
     if (!bm_enc) {
-        fprintf(stderr, "ERROR: Failed to encrypt build manifest!\n");
+        eprintf("ERROR: Failed to encrypt build manifest.\n");
         return 1;
     }
     
@@ -149,11 +152,17 @@ int main(int argc, char **argv)
     build_manifest = fopen("build-manifest.bin", "wb");
 
     if (!build_manifest) {
-        fprintf(stderr, "ERROR: Failed to open build manifest for writing!\n");
+        perror("ERROR: Failed to open build manifest for writing");
         return 1;
     }
 
-    fwrite(bm_enc, 1, 0xC + bm_json_len + 0x10 + 0x40, build_manifest);
+    if (fwrite(bm_enc, 1, 0xC + strlen(bm_json) + 0x10 + 0x40, build_manifest) != 0xC + strlen(bm_json) + 0x10 + 0x40) {
+        perror("ERROR: Failed to write to build manifest!");
+        free(bm_enc);
+        fclose(build_manifest);
+        return 1;
+    }
+
     free(bm_enc);
     
     fclose(build_manifest);

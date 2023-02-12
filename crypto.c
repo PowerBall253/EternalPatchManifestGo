@@ -23,6 +23,8 @@
 #include <sys/random.h>
 #include <openssl/evp.h>
 
+#define eprintf(...) fprintf(stderr, __VA_ARGS__)
+
 // Decrypt using AES GCM 128
 size_t gcm_decrypt(const unsigned char *ciphertext, const size_t ciphertext_len,
                 const unsigned char *aad, const size_t aad_len,
@@ -127,8 +129,10 @@ unsigned char *hex_to_bytes(const char *str)
         char *endptr;
         bytes[i / 2] = strtol(byte_str, &endptr, 16);
 
-        if (endptr == byte_str || *endptr != '\0' || errno == ERANGE)
+        if (endptr == byte_str || *endptr != '\0' || errno == ERANGE) {
+            free(bytes);
             return NULL;
+        }
     }
 
     return bytes;
@@ -146,7 +150,7 @@ char *decrypt_bm(const unsigned char *enc_data, const size_t enc_data_len, const
     unsigned char *ciphertext = malloc(enc_data_len - 0xC - 0x50);
 
     if (!ciphertext) {
-        fprintf(stderr, "ERROR: Failed to allocate memory for ciphertext!\n");
+        perror("ERROR: Failed to allocate memory");
         return NULL;
     }
 
@@ -155,15 +159,18 @@ char *decrypt_bm(const unsigned char *enc_data, const size_t enc_data_len, const
     unsigned char *key = hex_to_bytes(hex_key);
 
     if (!key) {
-        fprintf(stderr, "ERROR: Failed to get key bytes from provided key!\n");
-        fprintf(stderr, "Make sure the key provided is a valid hex string.\n");
+        eprintf("ERROR: Failed to get key bytes from provided key.\n");
+        eprintf("Make sure the key provided is a valid hex string.\n");
+        free(ciphertext);
         return NULL;
     }
 
     char *plaintext = malloc(enc_data_len - 0xC - 0x50);
 
     if (!plaintext) {
-        fprintf(stderr, "ERROR: Failed to allocate memory for plaintext!\n");
+        perror("ERROR: Failed to allocate memory");
+        free(key);
+        free(ciphertext);
         return NULL;
     }
 
@@ -174,7 +181,7 @@ char *decrypt_bm(const unsigned char *enc_data, const size_t enc_data_len, const
     free(ciphertext);
 
     if (res != enc_data_len - 0xC - 0x50) {
-        fprintf(stderr, "ERROR: Failed to decypt build manifest - corrupted file?\n");
+        eprintf("ERROR: Failed to decypt build manifest - corrupted file?\n");
         return NULL;
     }
 
@@ -187,15 +194,15 @@ unsigned char *encrypt_bm(const char *bm_json, const char *hex_key)
     unsigned char iv[0xC];
 
     if (getrandom(iv, 0xC, 0) != 0xC) {
-        fprintf(stderr, "ERROR: Failed to get random IV for encryption!\n");
+        perror("ERROR: Failed to get random IV for encryption");
         return NULL;
     }
     
     unsigned char *key = hex_to_bytes(hex_key);
 
     if (!key) {
-        fprintf(stderr, "ERROR: Failed to get key bytes from provided key!\n");
-        fprintf(stderr, "Make sure the key provided is a valid hex string.\n");
+        eprintf("ERROR: Failed to get key bytes from provided key.\n");
+        eprintf("Make sure the key provided is a valid hex string.\n");
         return NULL;
     }
 
@@ -203,7 +210,8 @@ unsigned char *encrypt_bm(const char *bm_json, const char *hex_key)
     unsigned char *ciphertext = malloc(strlen(bm_json));
 
     if (!key) {
-        fprintf(stderr, "ERROR: Failed to allocate memory for ciphertext\n");
+        perror("ERROR: Failed to allocate memory");
+        free(key);
         return NULL;
     }
 
@@ -212,7 +220,8 @@ unsigned char *encrypt_bm(const char *bm_json, const char *hex_key)
     free(key);
 
     if (res != strlen(bm_json)) {
-        fprintf(stderr, "ERROR: Failed to encrypt new build manifest!\n");
+        eprintf("ERROR: Failed to encrypt new build manifest.\n");
+        free(ciphertext);
         return NULL;
     }
 
@@ -221,7 +230,9 @@ unsigned char *encrypt_bm(const char *bm_json, const char *hex_key)
     unsigned char *bm_enc = malloc(bm_enc_len);
 
     if (!key) {
-        fprintf(stderr, "ERROR: Failed to allocate memory for new build manifest!\n");
+        perror("ERROR: Failed to allocate memory");
+        free(bm_enc);
+        free(ciphertext);
         return NULL;
     }
 
