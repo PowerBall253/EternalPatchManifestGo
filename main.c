@@ -139,6 +139,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    size_t bm_json_len = strlen(bm_json);
+
     // Re-encrypt the build manifest JSON
     unsigned char *bm_enc = encrypt_bm(bm_json, argv[1]);
     free(bm_json);
@@ -156,7 +158,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if (fwrite(bm_enc, 1, 0xC + strlen(bm_json) + 0x10 + 0x40, build_manifest) != 0xC + strlen(bm_json) + 0x10 + 0x40) {
+    if (fwrite(bm_enc, 1, 0xC + bm_json_len + 0x10 + 0x40, build_manifest) != 0xC + bm_json_len + 0x10 + 0x40) {
         perror("ERROR: Failed to write to build manifest!");
         free(bm_enc);
         fclose(build_manifest);
