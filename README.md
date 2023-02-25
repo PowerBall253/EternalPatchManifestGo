@@ -1,35 +1,37 @@
-# EternalPatchManifestLinux
+# EternalPatchManifestGo
 
-![Build Status](https://github.com/PowerBall253/EternalPatchManifestLinux/actions/workflows/test.yml/badge.svg)
+![Build Status](https://github.com/PowerBall253/EternalPatchManifestGo/actions/workflows/test.yml/badge.svg)
 
 
-DOOM Eternal build manifest patcher, rewritten in C for Linux.
+DOOM Eternal build manifest patcher, rewritten in Go.
 
 ## Usage
+
 ```
 ./DEternal_patchManifest <AES key>
 ```
+
 Where AES key is the key used for AES encryption/decryption. The current valid key is `8B031F6A24C5C4F3950130C57EF660E9`.
 
 ## Compiling
-The project uses Cmake to compile, and requires OpenSSL to be installed.
+The project requires the [go toolchain](https://go.dev/dl/) to be compiled.
 
-First clone the repo by running:
+To compile, run:
 
 ```
-git clone https://github.com/PowerBall253/EternalPatchManifestLinux.git
-```
-
-Then, generate the makefile by running:
-```
-cd EternalPatchManifestLinux
-mkdir build
-cd build
-cmake ..
+go build -o DEternal_patchManifest -ldflags="-s -w" .
 ```
 
-Finally, build with:
+To set a version number, build with:
+
 ```
-make
+go build -o DEternal_patchManifest -ldflags="-s -w -X 'main.Version=vX.Y.Z'" .
 ```
 
+(replace vX.Y.Z with the version number you prefer).
+
+Additionally, you may use [UPX](https://upx.github.io/) to compress the binary:
+
+```
+upx --best DEternal_patchManifest
+```
